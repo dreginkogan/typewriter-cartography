@@ -1,0 +1,7 @@
+.vscode/*.db
+.vscode/*.db-*.vscode/*.db
+.vscode/
+typerwriter_venv/
+allegheny.tif
+cropped_allegheny.tif
+*.tif
