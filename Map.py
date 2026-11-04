@@ -109,7 +109,7 @@ class Map:
         image_array *= levels # what the sigma do i multiply by
         image_array[image_array==4.0] = 3.0
 
-        binned_image_array = image_array.astype(np.uint8)
+        binned_image_array = image_array.astype(np.uint8) # sometimes acts weird
 
         print(np.min(binned_image_array),np.max(binned_image_array), np.mean(binned_image_array))
 
