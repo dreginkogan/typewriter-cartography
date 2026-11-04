@@ -14,6 +14,11 @@ class Map:
         """
         self.geo_data = geo_data
         self.dims = geo_data.size
+        self.aspect = self.dims[0] / self.dims[1]
+        self.typewriter_array = None
+        self.typewriter_arr_levels = None
+        self.typewriter_map = None
+
 
     # init with file path
     def __init__(self, filepath):
@@ -25,8 +30,13 @@ class Map:
         """
         self.geo_data = Image.open(filepath)
         self.dims = self.geo_data.size # PIL does width, height, as opposed to the usual Python convention
+        self.aspect = self.dims[0] / self.dims[1]
+        self.typewriter_array = None
+        self.typewriter_arr_levels = None
+        self.typewriter_map = None
 
-    def crop_to_paper(self, center, orientation, primary_dim, paper="letter"):
+
+    def crop_to_paper_aspect(self, center, orientation, primary_dim, paper="letter"):
         """
         Crop the geographical image to the specified region.
         
@@ -39,6 +49,7 @@ class Map:
         Returns:
         Map: A new Map instance with the cropped image.
         """
+        #modifies geo data itself
         paper = paper.lower()
         # can update with more sizes in the future, but I think this is fine for now.
         aspect_ratios = {
@@ -47,12 +58,13 @@ class Map:
             "a3": 420 / 297
         }
 
-        if orientation == 'portrait':
+        if orientation == 'landscape':
             width = primary_dim
-            height = int(width * aspect_ratios[paper])  # Maintain specified paper aspect ratio
-        elif orientation == 'landscape':
+            height = int(width / aspect_ratios[paper])  # Maintain specified paper aspect ratio
+
+        elif orientation == 'portrait':
             height = primary_dim
-            width = int(height * aspect_ratios[paper])
+            width = int(height / aspect_ratios[paper])
         else:
             raise ValueError("Orientation must be 'portrait' or 'landscape'")
 
@@ -64,9 +76,10 @@ class Map:
         cropped_image = self.geo_data.crop((left, upper, right, lower))
         self.geo_data = cropped_image
         self.dims = self.geo_data.size
+        self.aspect = self.dims[0] / self.dims[1]
         return self
 
-    def to_typewriter_map(self, orientation, width, levels=4, water_threshold=0.2, horizontal_keys_per_inch=10, vertical_keys_per_inch=6):
+    def to_typewriter_array(self, orientation, type_width, levels=4, water_threshold=0.2, horizontal_keys_per_inch=10, vertical_keys_per_inch=6):
         """
         Convert the geographical image to a typewriter map.
 
@@ -82,27 +95,28 @@ class Map:
         Map: A new Map instance with the typewriter map.
         """
 
-        #todo, fix how dimensions are scaled for portrait vs landscape
+        self.typewriter_arr_levels = levels
 
         # width is how wide on the page when printing
         #orientation refers to the orientation of the paper to display the map properly (in landscape, the map will be printed sideways)
         if orientation == 'portrait': # same way it is printed, same way it is displayed
-            width = int(width * horizontal_keys_per_inch)
-            height = int(width * vertical_keys_per_inch / horizontal_keys_per_inch)
-        elif orientation == 'landscape':
-            height = int(width * vertical_keys_per_inch)
-            width = int(height * horizontal_keys_per_inch / vertical_keys_per_inch)
+            crop_width = int(type_width * horizontal_keys_per_inch)
+            crop_height = int(type_width/self.aspect * vertical_keys_per_inch) # points up
+
+        elif orientation == 'landscape': # image is typed sideways 
+            crop_width = int(type_width * self.aspect * vertical_keys_per_inch) # points right
+            crop_height = int(type_width * horizontal_keys_per_inch)
         else:
             raise ValueError("Orientation must be 'portrait' or 'landscape'")
 
-
-        scaled_image = self.geo_data.resize((width, height), resample=3)
+        scaled_image = self.geo_data.resize((crop_width, crop_height), resample=3)
         image_array = np.array(scaled_image)
+
+        if orientation == 'landscape':
+            image_array = np.rot90(image_array, k=3)
 
         height_min = np.min(image_array)
         height_max = np.max(image_array)
-
-        print(height_min, height_max)
 
         image_array -= height_min
         image_array /= (height_max - height_min)
@@ -111,15 +125,22 @@ class Map:
 
         binned_image_array = image_array.astype(np.uint8) # sometimes acts weird
 
-        print(np.min(binned_image_array),np.max(binned_image_array), np.mean(binned_image_array))
-
         # need a better way of dealing with water
         water_negative = np.zeros_like(image_array)
-        water_negative[image_array > water_threshold] = 1 #1
+        water_negative[image_array > water_threshold] = 1 
 
         binned_image_array+=water_negative.astype(np.uint8) 
 
-        self.geo_data = Image.fromarray(binned_image_array.astype(np.uint8)*int(255/levels))
-        self.dimensions = self.geo_data.size
-        self.typewriter_arr = image_array
+        self.typewriter_array = binned_image_array
         return self
+
+    def get_typewriter_array(self):
+        return self.typewriter_array
+
+    def to_typewriter_map(self):
+        temp_map = Image.fromarray(self.typewriter_array.astype(np.uint8)*int(255/self.typewriter_arr_levels))
+        temp_dims = temp_map.size
+        print(temp_dims[0], temp_dims[1])
+        temp_map = temp_map.resize((temp_dims[0]*6, temp_dims[1]*10), Image.NEAREST)
+
+        return temp_map

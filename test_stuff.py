@@ -6,17 +6,12 @@ import matplotlib.pyplot as plt
 
 
 map_instance = Map("cropped_allegheny.tif")
-print(map_instance.dims)
 
-map_instance.crop_to_paper(center=(map_instance.dims[0] // 2, map_instance.dims[1] // 2), orientation='portrait', primary_dim=10000, paper='letter')
-# map_instance.to_typewriter_map(orientation='portrait', width=7.5)
-print(map_instance.dims)
+map_instance.crop_to_paper_aspect(center=(map_instance.dims[0] // 2, map_instance.dims[1] // 2), orientation='landscape', primary_dim=15000, paper='letter')
 
-# map_instance.to_typewriter_map(orientation='landscape', width=15, levels=8)
-map_instance.to_typewriter_map(orientation='landscape', width=7.5, levels=5)
+map_instance.to_typewriter_array(orientation='landscape', type_width=7.5, levels=5)
 
-print(map_instance.dimensions)
+typewriter_map = map_instance.to_typewriter_map()
 
-image = np.array(map_instance.geo_data)
+typewriter_map.save("output/test_image.png")
 
-Image.fromarray(image.astype(np.uint8)).save("output/test_image.png")
