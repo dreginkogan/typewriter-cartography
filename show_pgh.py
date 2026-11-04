@@ -3,7 +3,7 @@ import numpy as np
 import PIL
 
 PIL.Image.MAX_IMAGE_PIXELS = 300000000 # 300,000,000
-im = PIL.Image.open("cropped_allegheny.tif", )
+im = PIL.Image.open("cropped_allegheny.tif")
 
 im_x = im.size[0]
 im_y = im.size[1]
@@ -11,12 +11,15 @@ im_y = im.size[1]
 crop_box = [0+3700, 0+600, im_x-100, im_y-1000]
 im = im.crop(crop_box)
 
-print(im.size)
+scaling = 1 
 
-scaling = 2
-paper_size = (97*scaling, 75*scaling) #temporary, 
+# do i stretch image at this stage to account for character aspect ratios?
 
-resampled_size = paper_size#(round(im.size[0]*0.75), round(im.size[1]*0.75))
+# 10 chars horizontally per inch, 6 vertically   
+# vertical orientation for pgh. When i write a class, i won't hardcode everything 
+paper_size = (75*scaling, 60*scaling) #units are characters, should fit within a 7.5x10 inch square (if tiling, I can simply cut off the paper's margins)
+
+resampled_size = (26*scaling, 35*scaling)#(round(im.size[0]*0.75), round(im.size[1]*0.75))
 
 im = im.resize(resampled_size, resample=3)
 # make size paper better match what can fit on the paper -- leave margins. 7.5in x 10 in seems like a good size. 
@@ -24,6 +27,7 @@ im = im.resize(resampled_size, resample=3)
 # the img.show will display it weird as each pixel will be a square, but irl each character is a rectangle and will look better
 
 imarray = np.array(im)
+imarray = np.rot90(imarray, k=3) # needed for pittsburgh specifically, but may not be needed for other locations.
 
 height_min = np.min(imarray)
 height_max = np.max(imarray)
@@ -32,30 +36,38 @@ print(np.min(imarray), np.max(imarray))
 
 imarray -= height_min
 
-print(np.min(imarray), np.max(imarray))
-imarray = np.round(imarray/(height_max-height_min) * 100)
 
+imarray = imarray/(float(height_max)-height_min)*100 #float
 height_0 = np.zeros(imarray.shape)
 
 for i in range(imarray.shape[0]):
     for j in range(imarray.shape[1]):
-        if imarray[i,j] > 3: # need to mess around with this value, and also implement smoothing to remove noise
+        if imarray[i,j] > 5: # need to mess around with this value, and also implement smoothing to remove noise
             height_0[i,j] = 0
         else:
-            height_0[i,j] = 1
+            height_0[i,j] = 255
+
+print(f"glub {imarray}")
 
 print(np.min(imarray), np.max(imarray))
 num_levels = 5
-print(np.linspace(0, 100, num_levels+1))
-imarray = np.digitize(imarray, np.linspace(0, 100, num_levels+1)) #- 1
+# print(np.linspace(0, 100, num_levels+1))
+imarray = np.digitize(imarray, np.linspace(0, 100, num_levels+1)) * 40 #bad way to do it
 
-plt.imshow(imarray, interpolation='nearest')
-plt.show()
+print(imarray)
+# plt.imshow(imarray, interpolation='nearest')
+# plt.show()
 
-plt.imshow(height_0, interpolation='nearest')
-plt.show()
+# plt.imshow(height_0, interpolation='nearest')
+# plt.show()
 
+meh = np.stack([height_0, imarray, imarray], axis=-1)
 
+# print(meh[0])
+
+imgg = PIL.Image.fromarray(meh.astype(np.uint8))
+
+imgg.save("output.png") # still doesnt account for character aspect ratios
 #  . + @ $ will use as shades on typewriter
 
 # save the river and elevations as color channels and display as a single image

@@ -5,3 +5,4 @@ typerwriter_venv/
 allegheny.tif
 cropped_allegheny.tif
 *.tif
+*.png
