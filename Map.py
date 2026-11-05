@@ -137,10 +137,23 @@ class Map:
     def get_typewriter_array(self):
         return self.typewriter_array
 
-    def to_typewriter_map(self):
-        temp_map = Image.fromarray(self.typewriter_array.astype(np.uint8)*int(255/self.typewriter_arr_levels))
-        temp_dims = temp_map.size
-        print(temp_dims[0], temp_dims[1])
-        temp_map = temp_map.resize((temp_dims[0]*6, temp_dims[1]*10), Image.NEAREST)
+    def to_typewriter_map(self, mode='bw'): # need a better way to name modes
+
+        if mode=='bw':
+            temp_map = Image.fromarray(self.typewriter_array.astype(np.uint8)*int(255/self.typewriter_arr_levels))
+            temp_dims = temp_map.size
+            temp_map = temp_map.resize((temp_dims[0]*6, temp_dims[1]*10), Image.NEAREST)
+        elif mode=='rgb':
+            rows = self.typewriter_array.shape[0]
+            cols = self.typewriter_array.shape[1]
+            temp_arr = np.zeros((rows, cols, 3))
+            temp_arr[self.typewriter_array==0, 0] = self.typewriter_arr_levels # this is so jank
+            print(self.typewriter_array[self.typewriter_array!=0])
+            temp_arr[:, :, 2] = self.typewriter_array# so there can be black
+            temp_arr[:, :, 1] = self.typewriter_array
+
+            temp_map = Image.fromarray(temp_arr.astype(np.uint8)*int(255/self.typewriter_arr_levels))
+            temp_dims = temp_map.size
+            temp_map = temp_map.resize((temp_dims[0]*6, temp_dims[1]*10), Image.NEAREST)
 
         return temp_map

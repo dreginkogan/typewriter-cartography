@@ -11,7 +11,7 @@ map_instance.crop_to_paper_aspect(center=(map_instance.dims[0] // 2, map_instanc
 
 map_instance.to_typewriter_array(orientation='landscape', type_width=7.5, levels=5)
 
-typewriter_map = map_instance.to_typewriter_map()
+typewriter_map = map_instance.to_typewriter_map(mode="rgb")
 
 typewriter_map.save("output/test_image.png")
 
