@@ -6,3 +6,4 @@ allegheny.tif
 cropped_allegheny.tif
 *.tif
 output/*.png
+*.kra

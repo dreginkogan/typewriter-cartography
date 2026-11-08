@@ -3,8 +3,8 @@ Image.MAX_IMAGE_PIXELS = 300000000 # Increase the maximum number of pixels allow
 import numpy as np
 
 class Map:
-
-    # init with PIL image
+    #TODO make the annotations/docs here make sense for a CLI tool
+    #make dimensions and coords make sense and consistent throughout (PIL and numpy are flipped)
     def __init__(self, geo_data):
         """
         Initialize the Map class with geographical data.
@@ -41,7 +41,7 @@ class Map:
         Crop the geographical image to the specified region.
         
         Parameters:
-        center (tuple): The center coordinates of the crop box.
+        center (tuple): The center coordinates of the crop box. (x, y) [numpy is y x, with y=0 on top (increases down)]
         orientation (str): The orientation of the crop box ('portrait' or 'landscape').
         primary_dim (int): The primary dimension of the crop box in pixels, depending on the orientation.
         paper(str): The paper size to use for cropping. Default is "letter". Other sizes include "a4" and "a3".
@@ -137,7 +137,8 @@ class Map:
     def get_typewriter_array(self):
         return self.typewriter_array
 
-    def to_typewriter_map(self, mode='bw'): # need a better way to name modes
+    def to_typewriter_map(self, mode='rgb'): # need a better way to name modes/implement them
+        # display characters? display colors? both? custom definition?
 
         if mode=='bw':
             temp_map = Image.fromarray(self.typewriter_array.astype(np.uint8)*int(255/self.typewriter_arr_levels))
