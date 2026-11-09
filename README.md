@@ -55,6 +55,8 @@ The output is a .png image where each "pixel" corresponds to a character on a ty
 
 Run `python cli.py --help` for the full list.
 
+Cropping and finding the center of the crop are to be done via a process of trial and error. Since this tool is designed to be run from a command line, iterating on center coordinates can be done quickly and easily.
+
 ## Copying to a typewriter
 ![tool output](images/map_test.png)
 
