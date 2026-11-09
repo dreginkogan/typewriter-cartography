@@ -1,4 +1,3 @@
-# Typewriter Map
 # Typewriter Cartography Helper
 
 A command-line python tool that assists in creating maps using a typewriter (artistically).
