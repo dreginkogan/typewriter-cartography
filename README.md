@@ -1,10 +1,11 @@
 # Typewriter Map
+# Typewriter Cartography Helper
 
 A command-line python tool that assists in creating maps using a typewriter (artistically).
 
-![pittsburgh town is a smoky old town](images/pgh_typewriter_output.png =500x)
-
----
+<p align="center">
+<img src="images/pgh_typewriter_output.png" alt="pittsburgh town is a smoky old town" width="700" centered>
+</p>
 
 ## Inspiration
 
@@ -91,23 +92,30 @@ Run `typewriter-map --help` for the full list.
 Cropping and finding the center of the crop are to be done via a process of trial and error. Since this tool is designed to be run from a command line, iterating on center coordinates can be done quickly and easily.
 
 ## Copying to a typewriter
-![tool output](images/map_test.png)
+<p align="center">
+<img src="images/map_test.png" alt="Tool Output" width="300" centered>
+</p>
 
-TODO: put images of in-progress typing of a map on a typewriter.
+To type my map of Pittsburgh, I used 5 levels and I used the following characters to demarcate elevations, from lowest to highest:
 
-To type my map of Pittsburgh, I used 4 levels and I used the following characters to demarcate elevations, from lowest to highest:
-
+<div align="center">
+  
 | Level | Character |
 |---|---|
 | Water | red `X` |
 | Elevation 1 | space (blank) |
 | Elevation 2 | `:` |
 | Elevation 3 | `*` |
-| Elevation 4 | `$` |
+| Elevation 4 | `@` |
+| Elevation 5 | `$` |
+
+</div>
 
 
-My typewritten map looks like this:
-![pittsburgh town is a smoky old town](images/pgh_typewriter_output.png)
+After an hour or so of copying the .png output from the tool onto my typewriter, the map looks like this:
+<p align="center">
+<img src="images/pgh_typewriter_output.png" alt="pittsburgh town is a smoky old town" width="700" centered>
+</p>
 
 I used a 1949 Royal Typewriter, which has a ribbon switch, and a two-color black and red ribbon.
 
