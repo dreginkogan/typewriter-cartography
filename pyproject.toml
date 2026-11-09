@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "typewriter-cartography"
+version = "0.1.0"
+description = "Turn geographic TIFFs into typewriter art maps."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = ["typer", "pillow", "numpy"]
+
+[project.scripts]
+typewriter-map = "cli:app"
+
+[tool.setuptools]
+py-modules = ["cli", "Map"]
