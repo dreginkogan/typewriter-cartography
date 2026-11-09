@@ -2,8 +2,7 @@
 
 A software tool that assists in artistic typewriter cartography.
 
-![tool output](images/map_test.png)
-![pittsburgh town is a smoky old town](images/pgh_typewriter_output.png)
+![pittsburgh town is a smoky old town](images/pgh_typewriter_output.png =500x)
 
 ---
 
