@@ -36,13 +36,13 @@ class Map:
         self.typewriter_map = None
 
 
-    def crop_to_paper_aspect(self, center, orientation, primary_dim, paper="letter"):
+    def crop_to_paper_aspect(self, center, crop_orientation, primary_dim, paper="letter"):
         """
         Crop the geographical image to the specified region.
         
         Parameters:
-        center (tuple): The center coordinates of the crop box. (x, y) [numpy is y x, with y=0 on top (increases down)]
-        orientation (str): The orientation of the crop box ('portrait' or 'landscape').
+        center (tuple): The center coordinates of the crop box. (y/row, x/col)
+        crop_orientation (str): The orientation of the crop box ('portrait' or 'landscape').
         primary_dim (int): The primary dimension of the crop box in pixels, depending on the orientation.
         paper(str): The paper size to use for cropping. Default is "letter". Other sizes include "a4" and "a3".
 
@@ -50,7 +50,7 @@ class Map:
         Map: A new Map instance with the cropped image.
         """
         #modifies geo data itself
-        paper = paper.lower()
+        # paper = paper.lower()
         # can update with more sizes in the future, but I think this is fine for now.
         aspect_ratios = {
             "letter": 279 / 216,
@@ -58,28 +58,28 @@ class Map:
             "a3": 420 / 297
         }
 
-        if orientation == 'landscape':
+        if crop_orientation == 'landscape':
             width = primary_dim
             height = int(width / aspect_ratios[paper])  # Maintain specified paper aspect ratio
 
-        elif orientation == 'portrait':
+        elif crop_orientation == 'portrait':
             height = primary_dim
             width = int(height / aspect_ratios[paper])
         else:
             raise ValueError("Orientation must be 'portrait' or 'landscape'")
 
-        left = center[0] - width // 2 # using // instead of / to round to int
-        upper = center[1] - height // 2
-        right = center[0] + width // 2
-        lower = center[1] + height // 2
+        left = center[1] - width // 2 # using // instead of / to round to int
+        upper = center[0] - height // 2 # top is 0
+        right = center[1] + width // 2
+        lower = center[0] + height // 2
 
         cropped_image = self.geo_data.crop((left, upper, right, lower))
         self.geo_data = cropped_image
-        self.dims = self.geo_data.size
+        self.dims = self.geo_data.size # this is flipped
         self.aspect = self.dims[0] / self.dims[1]
         return self
 
-    def to_typewriter_array(self, orientation, type_width, levels=4, water_threshold=0.2, horizontal_keys_per_inch=10, vertical_keys_per_inch=6):
+    def to_typewriter_array(self, orientation, type_width, levels=4, water_threshold=0.8, horizontal_keys_per_inch=10, vertical_keys_per_inch=6):
         """
         Convert the geographical image to a typewriter map.
 
@@ -120,14 +120,14 @@ class Map:
 
         image_array -= height_min
         image_array /= (height_max - height_min)
-        image_array *= levels # what the sigma do i multiply by
-        image_array[image_array==4.0] = 3.0
+        image_array *= levels 
+        image_array[image_array==4.0] = 3.0 # high values clip, idk how to say what i want to say
 
         binned_image_array = image_array.astype(np.uint8) # sometimes acts weird
 
         # need a better way of dealing with water
         water_negative = np.zeros_like(image_array)
-        water_negative[image_array > water_threshold] = 1 
+        water_negative[image_array > water_threshold/levels] = 1 
 
         binned_image_array+=water_negative.astype(np.uint8) 
 
@@ -135,15 +135,28 @@ class Map:
         return self
 
     def get_typewriter_array(self):
+        '''
+        Returns numpy array of simplified elevation data
+        
+        Returns:
+        typewriter_array: 2D numpy array.'''
         return self.typewriter_array
 
-    def to_typewriter_map(self, mode='rgb'): # need a better way to name modes/implement them
+    def to_typewriter_map(self, mode='rgb', horizontal_keys_per_inch=10, vertical_keys_per_inch=6): # need a better way to name modes/implement them
+        '''
+        Returns 'map' of elevation data as an image that can be easily copied physically to a typewriter
+        
+        Parameters:
+        mode (str): the display mode of the map (still needs to be fully implemented)
+        
+        Returns:
+        temp_map (PIL.Image): PIL Image object of the simplified/binned elevations'''
         # display characters? display colors? both? custom definition?
 
         if mode=='bw':
             temp_map = Image.fromarray(self.typewriter_array.astype(np.uint8)*int(255/self.typewriter_arr_levels))
             temp_dims = temp_map.size
-            temp_map = temp_map.resize((temp_dims[0]*6, temp_dims[1]*10), Image.NEAREST)
+            temp_map = temp_map.resize((temp_dims[0]*vertical_keys_per_inch, temp_dims[1]*horizontal_keys_per_inch), Image.NEAREST)
         elif mode=='rgb':
             rows = self.typewriter_array.shape[0]
             cols = self.typewriter_array.shape[1]
@@ -155,6 +168,6 @@ class Map:
 
             temp_map = Image.fromarray(temp_arr.astype(np.uint8)*int(255/self.typewriter_arr_levels))
             temp_dims = temp_map.size
-            temp_map = temp_map.resize((temp_dims[0]*6, temp_dims[1]*10), Image.NEAREST)
+            temp_map = temp_map.resize((temp_dims[0]*vertical_keys_per_inch, temp_dims[1]*horizontal_keys_per_inch), Image.NEAREST)
 
         return temp_map
