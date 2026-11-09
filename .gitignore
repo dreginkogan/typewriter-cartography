@@ -7,3 +7,4 @@ cropped_allegheny.tif
 *.tif
 output/*.png
 *.kra
+__pycache__/
