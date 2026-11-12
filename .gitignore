@@ -8,3 +8,5 @@ cropped_allegheny.tif
 output/*.png
 *.kra
 __pycache__/
+*.tar
+*.gz
