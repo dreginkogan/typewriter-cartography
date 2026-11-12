@@ -54,7 +54,7 @@ Restart your terminal afterward for the tool to function.
 
 ## Usage
 
-You will need an elevation raster (DEM) saved as a TIFF file. Single-band elevation data works best, since the tool bins raw height values into a small number of levels (the default is 4). Free DEMs are available online from sources like the [USGS National Map](https://www.usgs.gov/programs/national-geospatial-program/national-map).
+You will need an elevation raster (DEM) saved as a TIFF file. Single-band elevation data works best, since the tool bins raw height values into a small number of levels (the default is 4). Free DEMs are available online from sources like the [USGS National Map](https://www.usgs.gov/programs/national-geospatial-program/national-map), [Open Topography](https://opentopography.org/), and [NASA DEM](https://www.earthdata.nasa.gov/topics/land-surface/digital-elevation-terrain-model-dem).
 
 
 A basic run, using the center of the TIFF and the defaults:

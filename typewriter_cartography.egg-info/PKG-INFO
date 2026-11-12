@@ -8,40 +8,74 @@ Requires-Dist: typer
 Requires-Dist: pillow
 Requires-Dist: numpy
 
-# typewriter-cartography
+# Typewriter Cartography Helper
 
-A software tool that assists in artistic typewriter cartography.
+A command-line python tool that assists in creating maps using a typewriter (artistically).
 
-![pittsburgh town is a smoky old town](images/pgh_typewriter_output.png =500x)
-
----
+<p align="center">
+<img src="images/pgh_typewriter_output.png" alt="pittsburgh town is a smoky old town" width="700" centered>
+</p>
 
 ## Inspiration
 
-This project was inspired by [Daniel Huffman's venture into creating maps using a typewriter](https://somethingaboutmaps.wordpress.com/2018/11/26/typewriter-cartography/). I was really enamored by his map of Africa in particular, and I really liked how he was able to show elevation using different characters, and delineate coastlines and rivers using red ink. 
+This project was inspired by [Daniel Huffman's venture into creating maps using a typewriter](https://somethingaboutmaps.wordpress.com/2018/11/26/typewriter-cartography/). I was really inspired by his map of Africa in particular, and I liked how he was able to show elevation using different characters, and delineate coastlines and rivers using red ink. 
 
-When I first saw his work, I had recently acquired a typewriter, and wanted to do something similar -- namely making an elevation map of my home, Pittsburgh.
+When I first saw his work, I had recently acquired an old, bulky typewriter from 1949, and wanted to do something similar -- namely make an elevation map of my home, Pittsburgh, Pennsylvania.
 
-I thus wanted to create a software tool that can make the process of converting elevation maps into low-resolution pixel maps which can be copied over mechanically via a typewriter.
+I thus wanted to create a software tool that automates the process of converting elevation maps into low-resolution pixel maps, which can then be copied onto a sheet of paper using a typewriter.
 
 ## Installation
 
-TODO
+### Quick install
+
+With [pipx](https://pipx.pypa.io/) -- installs the command in its own isolated environment:
+
+```bash
+pipx install git+https://github.com/dreginkogan/typewriter-cartography.git
+```
+
+### From source
+
+```bash
+git clone https://github.com/dreginkogan/typewriter-cartography.git
+cd typewriter-cartography
+
+python -m venv .venv
+source .venv/bin/activate
+
+pip install .
+```
+
+For development, use `pip install -e .` instead, such that code changes take effect without reinstalling.
+
+### Check if installation worked
+
+```bash
+typewriter-map --help
+```
+
+### Optional: tab completion
+
+```bash
+typewriter-map --install-completion
+```
+
+Restart your terminal afterward for the tool to function.
 
 ## Usage
 
-You will need an elevation raster (DEM) saved as a TIFF. Single-band elevation data works best, since the tool bins raw height values into a few levels (the default is 4). Free DEMs are available online from sources like the [USGS National Map](https://www.usgs.gov/programs/national-geospatial-program/national-map).
+You will need an elevation raster (DEM) saved as a TIFF file. Single-band elevation data works best, since the tool bins raw height values into a small number of levels (the default is 4). Free DEMs are available online from sources like the [USGS National Map](https://www.usgs.gov/programs/national-geospatial-program/national-map).
 
 
 A basic run, using the center of the TIFF and the defaults:
 ```bash
-python cli.py INPUT.tif [OPTIONS]
+typewriter-map INPUT.tif [OPTIONS]
 ```
 
-Here is what I ran to generate a map for Pittsburgh.
+Here is what I ran to generate a map of Pittsburgh.
 
 ```bash
-python cli.py cropped_allegheny.tif --output output/map_test.png --center 7500 11000 --primary-dim 15000
+typewriter-map cropped_allegheny.tif --output output/map_test.png --center 7500 11000 --primary-dim 15000
 ```
 
 The output is a .png image where each "pixel" corresponds to a character on a typewriter. Water is displayed as red, and elevations are shown as different shades of blue-green. 
@@ -62,28 +96,35 @@ The output is a .png image where each "pixel" corresponds to a character on a ty
 | `--vertical-keys-per-inch` | `6` | How many keys per inch, vertically, on the physical typewriter. |
 
 
-Run `python cli.py --help` for the full list.
+Run `typewriter-map --help` for the full list.
 
 Cropping and finding the center of the crop are to be done via a process of trial and error. Since this tool is designed to be run from a command line, iterating on center coordinates can be done quickly and easily.
 
 ## Copying to a typewriter
-![tool output](images/map_test.png)
+<p align="center">
+<img src="images/map_test.png" alt="Tool Output" width="300" centered>
+</p>
 
-TODO: put images of in-progress typing of a map on a typewriter.
+To type my map of Pittsburgh, I used 5 levels and I used the following characters to demarcate elevations, from lowest to highest:
 
-To type my map of Pittsburgh, I used 4 levels and I used the following characters to demarcate elevations, from lowest to highest:
-
+<div align="center">
+  
 | Level | Character |
 |---|---|
 | Water | red `X` |
 | Elevation 1 | space (blank) |
 | Elevation 2 | `:` |
 | Elevation 3 | `*` |
-| Elevation 4 | `$` |
+| Elevation 4 | `@` |
+| Elevation 5 | `$` |
+
+</div>
 
 
-My typewritten map looks like this:
-![pittsburgh town is a smoky old town](images/pgh_typewriter_output.png)
+After an hour or so of copying the .png output from the tool onto my typewriter, the map looks like this:
+<p align="center">
+<img src="images/pgh_typewriter_output.png" alt="pittsburgh town is a smoky old town" width="700" centered>
+</p>
 
 I used a 1949 Royal Typewriter, which has a ribbon switch, and a two-color black and red ribbon.
 
