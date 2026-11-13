@@ -121,3 +121,7 @@ I used a 1949 Royal Typewriter, which has a ribbon switch, and a two-color black
 <!-- TODO: add photos of a map in-progress on my typewriter -->
 
 ## Gallery
+
+<p align="center">
+<img src="images/coney.png" alt="South Brooklyn" width="700" centered>
+</p>

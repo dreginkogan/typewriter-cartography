@@ -109,8 +109,20 @@ class Map:
         else:
             raise ValueError("Orientation must be 'portrait' or 'landscape'")
 
-        scaled_image = self.geo_data.resize((crop_width, crop_height), resample=3)
+
+        # dealing with weird NaN stuff that might happen with some .tif files
+        raw = np.array(self.geo_data, dtype=np.float32)
+        bad = ~np.isfinite(raw) | (raw < -1000)   # NaN, inf, or sentinel nodata values
+        raw[bad] = raw[~bad].min()                # fill with the lowest real elevation
+        scaled_image = Image.fromarray(raw).resize((crop_width, crop_height), resample=3)
         image_array = np.array(scaled_image)
+
+        image_array = np.nan_to_num(image_array, nan=np.nanmin(image_array))
+        image_array[image_array < -1e30] = np.nan
+        image_array = np.nan_to_num(image_array, nan=np.nanmin(image_array))
+        lo, hi = np.percentile(image_array, [1, 99])
+        image_array = np.clip(image_array, lo, hi)
+
 
         if orientation == 'landscape':
             image_array = np.rot90(image_array, k=3)
@@ -121,7 +133,8 @@ class Map:
         image_array -= height_min
         image_array /= (height_max - height_min)
         image_array *= levels 
-        image_array[image_array==4.0] = 3.0 # high values clip, idk how to say what i want to say
+
+        image_array[image_array==float(levels)] = levels-1.0 # high values clip, idk how to say what i want to say
 
         binned_image_array = image_array.astype(np.uint8) # sometimes acts weird
 
